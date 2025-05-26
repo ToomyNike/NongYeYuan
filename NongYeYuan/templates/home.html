@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>农业源调查表统计分析工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- Tailwind配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4CAF50',     // 主色调：绿色，代表农业
+                        secondary: '#FF9800',   // 辅助色：橙色，代表收获
+                        neutral: '#F5F7FA',     // 中性色：浅灰，用于背景
+                        dark: '#2D3748',        // 深色：深灰，用于文本
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03)',
+                        'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                    }
+                },
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .bg-pattern {
+                background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234CAF50' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            }
+            .transition-custom {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+        }
+    </style>
+</head>
+<body class="bg-neutral bg-pattern min-h-screen">
+    <!-- 顶部导航栏 -->
+    <header class="bg-primary text-white shadow-md sticky top-0 z-50 transition-custom">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa fa-leaf text-2xl"></i>
+                <h1 class="text-xl md:text-2xl font-bold">农业源调查表统计分析工具</h1>
+            </div>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#" class="hover:text-secondary transition-custom flex items-center">
+                    <i class="fa fa-home mr-2"></i>首页
+                </a>
+                <a href="#" class="hover:text-secondary transition-custom flex items-center">
+                    <i class="fa fa-question-circle mr-2"></i>帮助
+                </a>
+                <a href="#" class="hover:text-secondary transition-custom flex items-center">
+                    <i class="fa fa-info-circle mr-2"></i>关于
+                </a>
+            </nav>
+            <button class="md:hidden text-white text-xl">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 欢迎信息 -->
+        <section class="mb-12 text-center">
+            <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-dark mb-4">
+                高效分析农业数据，助力科学决策
+            </h2>
+            <p class="text-gray-600 max-w-3xl mx-auto text-lg">
+                上传您的农业源调查表Excel数据，系统将自动进行统计分析，生成专业的结果报表，为您的农业决策提供数据支持。
+            </p>
+        </section>
+
+        <!-- 上传区域 -->
+        <section class="bg-white rounded-xl shadow-card p-8 mb-12 transition-custom hover:shadow-card-hover">
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="md:w-full">
+                    <h3 class="text-2xl font-bold text-dark mb-4 flex items-center">
+                        <i class="fa fa-upload text-primary mr-3"></i>上传数据
+                    </h3>
+                    <p class="text-gray-600 mb-6">
+                        请上传包含农业源调查数据的Excel文件，系统支持.xlsx和.xls格式。
+                    </p>
+                    
+                    <!-- 上传文件区域 -->
+                    <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-custom">
+                        <i class="fa fa-file-excel-o text-5xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-500 mb-2">拖放Excel文件到此处，或点击上传</p>
+                        <p class="text-xs text-gray-400">支持 .xlsx, .xls 格式，最大文件大小 50MB</p>
+                        <input type="file" id="file-input" class="hidden" accept=".xlsx,.xls">
+                    </div>
+                    
+                    <!-- 已选择文件信息 -->
+                    <div id="file-info" class="mt-4 hidden">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fa fa-file-excel-o text-primary mr-3"></i>
+                                <div>
+                                    <p id="file-name" class="font-medium text-dark truncate max-w-xs"></p>
+                                    <p id="file-size" class="text-xs text-gray-500"></p>
+                                </div>
+                            </div>
+                            <button id="remove-file" class="text-gray-400 hover:text-red-500 transition-custom">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 开始计算按钮 -->
+                    <div class="mt-8 text-center">
+                        <button id="calculate-btn" class="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-custom flex items-center mx-auto disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <i class="fa fa-calculator mr-2"></i>
+                            开始计算
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 结果区域 -->
+        <section id="result-section" class="bg-white rounded-xl shadow-card p-8 mb-12 transition-custom hover:shadow-card-hover hidden">
+            <h3 class="text-2xl font-bold text-dark mb-6 flex items-center">
+                <i class="fa fa-bar-chart text-primary mr-3"></i>分析结果
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- 结果卡片 1 -->
+                <div class="bg-neutral rounded-lg p-5 shadow-sm">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="font-semibold text-dark">数据总量</h4>
+                        <span class="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs">
+                            <i class="fa fa-database mr-1"></i>数据
+                        </span>
+                    </div>
+                    <p id="total-records" class="text-3xl font-bold text-dark">--</p>
+                    <p class="text-gray-500 text-sm">条记录</p>
+                </div>
+                
+                <!-- 结果卡片 2 -->
+                <div class="bg-neutral rounded-lg p-5 shadow-sm">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="font-semibold text-dark">分析耗时</h4>
+                        <span class="bg-secondary/10 text-secondary px-2 py-1 rounded-full text-xs">
+                            <i class="fa fa-clock-o mr-1"></i>性能
+                        </span>
+                    </div>
+                    <p id="analysis-time" class="text-3xl font-bold text-dark">--</p>
+                    <p class="text-gray-500 text-sm">秒</p>
+                </div>
+                
+                <!-- 结果卡片 3 -->
+                <div class="bg-neutral rounded-lg p-5 shadow-sm">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="font-semibold text-dark">完成状态</h4>
+                        <span class="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs">
+                            <i class="fa fa-check-circle mr-1"></i>成功
+                        </span>
+                    </div>
+                    <p id="result-status" class="text-3xl font-bold text-green-600">已完成</p>
+                    <p class="text-gray-500 text-sm">分析成功</p>
+                </div>
+            </div>
+            
+            <!-- 操作按钮 -->
+            <div class="flex flex-wrap gap-4 justify-center">
+                <a id="download-btn" href="#" class="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-custom flex items-center">
+                    <i class="fa fa-download mr-2"></i>
+                    下载结果
+                </a>
+                <button id="new-analysis-btn" class="bg-gray-200 hover:bg-gray-300 text-dark font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-custom flex items-center">
+                    <i class="fa fa-refresh mr-2"></i>
+                    新分析
+                </button>
+            </div>
+        </section>
+
+        <!-- 处理中状态 -->
+        <section id="processing-section" class="bg-white rounded-xl shadow-card p-8 mb-12 transition-custom hover:shadow-card-hover hidden">
+            <div class="flex flex-col items-center justify-center py-8">
+                <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mb-4"></div>
+                <h3 class="text-xl font-bold text-dark mb-2">正在处理数据</h3>
+                <p class="text-gray-600 mb-6">系统正在进行数据分析，请稍候...</p>
+                <div class="w-full max-w-md bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-primary h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <p id="progress-text" class="text-sm text-gray-500 mt-2">0% 完成</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h4 class="text-lg font-bold mb-4">农业源调查表统计分析工具</h4>
+                    <p class="text-gray-400 text-sm">
+                        为农业领域提供专业的数据统计和分析服务，助力农业决策科学化。
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">快速链接</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-custom">首页</a></li>
+                        <li><a href="#" class="hover:text-white transition-custom">使用指南</a></li>
+                        <li><a href="#" class="hover:text-white transition-custom">常见问题</a></li>
+                        <li><a href="#" class="hover:text-white transition-custom">联系我们</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">联系我们</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li class="flex items-center"><i class="fa fa-envelope-o mr-2"></i> support@example.com</li>
+                        <li class="flex items-center"><i class="fa fa-phone mr-2"></i> +86 123 4567 8910</li>
+                        <li class="flex items-center"><i class="fa fa-map-marker mr-2"></i> 北京市海淀区中关村南大街5号</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">关注我们</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition-custom">
+                            <i class="fa fa-weixin"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition-custom">
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition-custom">
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-4">
+                        订阅我们的通讯，获取最新农业数据分析技术和资讯
+                    </p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2025 农业源调查表统计分析工具 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+            const fileInfo = document.getElementById('file-info');
+            const fileName = document.getElementById('file-name');
+            const fileSize = document.getElementById('file-size');
+            const removeFile = document.getElementById('remove-file');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const processingSection = document.getElementById('processing-section');
+            const resultSection = document.getElementById('result-section');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const newAnalysisBtn = document.getElementById('new-analysis-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            
+            // 模拟数据 - 在实际应用中，这些数据将从服务器返回
+            const mockResultData = {
+                totalRecords: 1568,
+                analysisTime: 4.2,
+            };
+            
+            // 文件上传区域点击事件
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // 拖放功能
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('border-primary');
+                uploadArea.classList.add('bg-primary/5');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('border-primary');
+                uploadArea.classList.remove('bg-primary/5');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('border-primary');
+                uploadArea.classList.remove('bg-primary/5');
+                
+                if (e.dataTransfer.files.length) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+            
+            // 文件选择事件
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length) {
+                    handleFile(fileInput.files[0]);
+                }
+            });
+            
+            // 移除文件
+            removeFile.addEventListener('click', () => {
+                resetFileSelection();
+            });
+            
+            // 开始计算按钮点击事件
+            calculateBtn.addEventListener('click', () => {
+                // 显示处理中状态
+                processingSection.classList.remove('hidden');
+                resultSection.classList.add('hidden');
+                
+                // 模拟进度条动画
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    if (progress > 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        
+                        // 模拟处理完成，显示结果
+                        setTimeout(() => {
+                            processingSection.classList.add('hidden');
+                            resultSection.classList.remove('hidden');
+                            updateResultSection();
+                        }, 500);
+                    }
+                    
+                    progressBar.style.width = `${progress}%`;
+                    progressText.textContent = `${Math.round(progress)}% 完成`;
+                }, 300);
+            });
+            
+            // 新分析按钮点击事件
+            newAnalysisBtn.addEventListener('click', () => {
+                resultSection.classList.add('hidden');
+                resetFileSelection();
+            });
+            
+            // 处理文件选择
+            function handleFile(file) {
+                // 检查文件类型
+                if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
+                    alert('请上传Excel文件 (.xlsx 或 .xls)');
+                    return;
+                }
+                
+                // 显示文件信息
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileInfo.classList.remove('hidden');
+                
+                // 启用计算按钮
+                calculateBtn.disabled = false;
+            }
+            
+            // 重置文件选择
+            function resetFileSelection() {
+                fileInput.value = '';
+                fileInfo.classList.add('hidden');
+                calculateBtn.disabled = true;
+            }
+            
+            // 格式化文件大小
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            // 更新结果区域
+            function updateResultSection() {
+                // 更新统计数据
+                document.getElementById('total-records').textContent = mockResultData.totalRecords;
+                document.getElementById('analysis-time').textContent = mockResultData.analysisTime;
+            }
+            
+            // 模拟下载功能
+            downloadBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                simulateDownload();
+            });
+            
+            // 模拟下载
+            function simulateDownload() {
+                // 创建一个临时的a标签用于下载
+                const link = document.createElement('a');
+                link.href = 'https://picsum.photos/800/600?random=1'; // 模拟的下载文件
+                link.download = '农业数据分析结果.xlsx';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+    </script>
+</body>
+</html>
+    

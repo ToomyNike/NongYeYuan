@@ -9,7 +9,13 @@ CSS 轻量级框架Bootstrap
 JS jQuery 
 
 #### 软件架构
-
+NONGYETYUAN
+    PythonScript:脚本算法
+    NongYeYuan:Flask蓝图结构
+        templates:HTML前端文件
+        views:视图方法文件
+        __init()__.py：falsk初始化和方法注册
+    app.py:启动函数
 
 #### 安装教程
 
