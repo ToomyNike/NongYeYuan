@@ -214,40 +214,9 @@
                     <h4 class="text-lg font-bold mb-4">快速链接</h4>
                     <ul class="space-y-2 text-sm text-gray-400">
                         <li><a href="#" class="hover:text-white transition-custom">首页</a></li>
-                        <li><a href="#" class="hover:text-white transition-custom">使用指南</a></li>
-                        <li><a href="#" class="hover:text-white transition-custom">常见问题</a></li>
-                        <li><a href="#" class="hover:text-white transition-custom">联系我们</a></li>
                     </ul>
-                </div>
-                
-                <div>
-                    <h4 class="text-lg font-bold mb-4">联系我们</h4>
-                    <ul class="space-y-2 text-sm text-gray-400">
-                        <li class="flex items-center"><i class="fa fa-envelope-o mr-2"></i> support@example.com</li>
-                        <li class="flex items-center"><i class="fa fa-phone mr-2"></i> +86 123 4567 8910</li>
-                        <li class="flex items-center"><i class="fa fa-map-marker mr-2"></i> 北京市海淀区中关村南大街5号</li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h4 class="text-lg font-bold mb-4">关注我们</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition-custom">
-                            <i class="fa fa-weixin"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition-custom">
-                            <i class="fa fa-weibo"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-primary transition-custom">
-                            <i class="fa fa-github"></i>
-                        </a>
-                    </div>
-                    <p class="text-gray-400 text-sm mt-4">
-                        订阅我们的通讯，获取最新农业数据分析技术和资讯
-                    </p>
                 </div>
             </div>
-            
             <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
                 <p>© 2025 农业源调查表统计分析工具 版权所有</p>
             </div>
@@ -255,9 +224,7 @@
     </footer>
 
     <script>
-        // 页面加载完成后执行
         document.addEventListener('DOMContentLoaded', function() {
-            // 获取DOM元素
             const uploadArea = document.getElementById('upload-area');
             const fileInput = document.getElementById('file-input');
             const fileInfo = document.getElementById('file-info');
@@ -271,85 +238,96 @@
             const progressText = document.getElementById('progress-text');
             const newAnalysisBtn = document.getElementById('new-analysis-btn');
             const downloadBtn = document.getElementById('download-btn');
-            
+
             // 模拟数据 - 在实际应用中，这些数据将从服务器返回
             const mockResultData = {
                 totalRecords: 1568,
                 analysisTime: 4.2,
             };
-            
+
             // 文件上传区域点击事件
             uploadArea.addEventListener('click', () => {
                 fileInput.click();
             });
-            
+
             // 拖放功能
             uploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 uploadArea.classList.add('border-primary');
                 uploadArea.classList.add('bg-primary/5');
             });
-            
+
             uploadArea.addEventListener('dragleave', () => {
                 uploadArea.classList.remove('border-primary');
                 uploadArea.classList.remove('bg-primary/5');
             });
-            
+
             uploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
                 uploadArea.classList.remove('border-primary');
                 uploadArea.classList.remove('bg-primary/5');
-                
+
                 if (e.dataTransfer.files.length) {
                     handleFile(e.dataTransfer.files[0]);
                 }
             });
-            
+
             // 文件选择事件
             fileInput.addEventListener('change', () => {
                 if (fileInput.files.length) {
                     handleFile(fileInput.files[0]);
                 }
             });
-            
+
             // 移除文件
             removeFile.addEventListener('click', () => {
                 resetFileSelection();
             });
-            
+
             // 开始计算按钮点击事件
-            calculateBtn.addEventListener('click', () => {
-                // 显示处理中状态
+            calculateBtn.addEventListener('click', async () => {
                 processingSection.classList.remove('hidden');
                 resultSection.classList.add('hidden');
-                
-                // 模拟进度条动画
-                let progress = 0;
-                const interval = setInterval(() => {
-                    progress += Math.random() * 15;
-                    if (progress > 100) {
-                        progress = 100;
-                        clearInterval(interval);
-                        
-                        // 模拟处理完成，显示结果
-                        setTimeout(() => {
-                            processingSection.classList.add('hidden');
-                            resultSection.classList.remove('hidden');
-                            updateResultSection();
-                        }, 500);
+
+                const formData = new FormData();
+                formData.append('file-input', fileInput.files[0]);
+
+                try {
+                    const response = await fetch('/home', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const result = await response.text();
+                        console.log(result);
+
+                        // 模拟进度条动画
+                        let progress = 0;
+                        const interval = setInterval(() => {
+                            progress += Math.random() * 15;
+                            if (progress > 100) {
+                                progress = 100;
+                                clearInterval(interval);
+
+                                // 模拟处理完成，显示结果
+                                setTimeout(() => {
+                                    processingSection.classList.add('hidden');
+                                    resultSection.classList.remove('hidden');
+                                    updateResultSection();
+                                }, 500);
+                            }
+                            progressBar.style.width = `${progress}%`;
+                            progressText.textContent = `${Math.round(progress)}% 完成`;
+                        }, 300);
+                    } else {
+                        console.error('文件上传失败');
                     }
-                    
-                    progressBar.style.width = `${progress}%`;
-                    progressText.textContent = `${Math.round(progress)}% 完成`;
-                }, 300);
+                } catch (error) {
+                    console.error('请求出错:', error);
+                }
             });
-            
-            // 新分析按钮点击事件
-            newAnalysisBtn.addEventListener('click', () => {
-                resultSection.classList.add('hidden');
-                resetFileSelection();
-            });
-            
+
             // 处理文件选择
             function handleFile(file) {
                 // 检查文件类型
@@ -357,47 +335,47 @@
                     alert('请上传Excel文件 (.xlsx 或 .xls)');
                     return;
                 }
-                
+
                 // 显示文件信息
                 fileName.textContent = file.name;
                 fileSize.textContent = formatFileSize(file.size);
                 fileInfo.classList.remove('hidden');
-                
+
                 // 启用计算按钮
                 calculateBtn.disabled = false;
             }
-            
+
             // 重置文件选择
             function resetFileSelection() {
                 fileInput.value = '';
                 fileInfo.classList.add('hidden');
                 calculateBtn.disabled = true;
             }
-            
+
             // 格式化文件大小
             function formatFileSize(bytes) {
                 if (bytes === 0) return '0 Bytes';
-                
+
                 const k = 1024;
                 const sizes = ['Bytes', 'KB', 'MB', 'GB'];
                 const i = Math.floor(Math.log(bytes) / Math.log(k));
-                
+
                 return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
             }
-            
+
             // 更新结果区域
             function updateResultSection() {
                 // 更新统计数据
                 document.getElementById('total-records').textContent = mockResultData.totalRecords;
                 document.getElementById('analysis-time').textContent = mockResultData.analysisTime;
             }
-            
+
             // 模拟下载功能
             downloadBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 simulateDownload();
             });
-            
+
             // 模拟下载
             function simulateDownload() {
                 // 创建一个临时的a标签用于下载
@@ -412,4 +390,3 @@
     </script>
 </body>
 </html>
-    
