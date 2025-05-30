@@ -5,9 +5,10 @@ import os
 入口，将需要计算的文件放入input文件夹中运行。
 结果保存在output中。
 """
-folder_path = 'input'
-result_folder = 'output'
+folder_path = "input"
+result_folder = "output"
 
+print("正在处理文件夹中的文件...")
 class Conversion_Parameters:
     def __init__(self):
         """
@@ -106,10 +107,17 @@ class Conversion_Parameters:
         self.CF_OTHER_MAX = 1
         self.CF_OTHER_MIN = 1
 
+
+
+
+
+# for file_name in os.listdir("input"):
+#     print(file_name)
+
+
 # 遍历需要计算的文件夹（input)中的所有文件并且创建我需要计算和转化单位的表
-for file_name in os.listdir(folder_path):
+for file_name in os.listdir("input"):
     if file_name.endswith('.xlsx'):
-        print(file_name)
         CP = Conversion_Parameters()
         wb = openpyxl.load_workbook(f"input/{file_name}", data_only = True)
         original_sheet = wb.active
@@ -672,6 +680,7 @@ for file_name in os.listdir(folder_path):
         beautify_sheet(TN_MIN_sheet)
         beautify_sheet(TP_MAX_sheet)
         beautify_sheet(TP_MIN_sheet)
+        
         beautify_sheet(SUM_sheet)
         print(os.path.join(result_folder, f'result_{file_name}'))
         if not os.path.exists(result_folder):

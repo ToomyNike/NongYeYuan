@@ -4,7 +4,7 @@ import os
 hm = Blueprint('home', __name__)
 
 # 配置上传文件夹
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = 'input'
 # 确保上传文件夹存在
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
