@@ -57,9 +57,28 @@
                 <a href="#" class="hover:text-secondary transition-custom flex items-center">
                     <i class="fa fa-home mr-2"></i>首页
                 </a>
-                <a href="#" class="hover:text-secondary transition-custom flex items-center">
+                <a href="#" id="help-link" class="hover:text-secondary transition-custom flex items-center">
                     <i class="fa fa-question-circle mr-2"></i>帮助
                 </a>
+                <!-- 模态框容器 -->
+<div id="help-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl">
+        <div class="flex justify-between items-start mb-4">
+            <h3 class="text-xl font-bold text-gray-900">帮助信息</h3>
+            <button id="close-modal" class="text-gray-400 hover:text-gray-500">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="mb-6">
+            <p class="text-gray-700">联系开发人员CJY13368718528</p>
+        </div>
+        <div class="flex justify-end">
+            <button id="confirm-modal" class="bg-primary hover:bg-primary/90 text-white font-bold py-2 px-6 rounded-full transition-custom">
+                确定
+            </button>
+        </div>
+    </div>
+</div>
                 <a href="#" class="hover:text-secondary transition-custom flex items-center">
                     <i class="fa fa-info-circle mr-2"></i>关于
                 </a>
@@ -75,7 +94,7 @@
         <!-- 欢迎信息 -->
         <section class="mb-12 text-center">
             <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-dark mb-4">
-                高效分析农业数据，助力科学决策
+                高效计算农业源数据，助力科学决策
             </h2>
             <p class="text-gray-600 max-w-3xl mx-auto text-lg">
                 上传您的农业源调查表Excel数据，系统将自动进行统计分析，生成专业的结果报表，为您的农业决策提供数据支持。
@@ -249,7 +268,7 @@
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
-                    <h4 class="text-lg font-bold mb-4">农业源调查表统计分析工具</h4>
+                    <h4 class="text-lg font-bold mb-4">云南农业大学</h4>
                     <p class="text-gray-400 text-sm">
                         为农业领域提供专业的数据统计和分析服务，助力农业决策科学化。
                     </p>
@@ -263,7 +282,7 @@
                 </div>
             </div>
             <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
-                <p>© 2025 农业源调查表统计分析工具 版权所有</p>
+                <p>© 2025 云南农业大学农业源调查表统计分析工具 版权所有</p>
             </div>
         </div>
     </footer>
@@ -284,10 +303,14 @@
             const newAnalysisBtn = document.getElementById('new-analysis-btn');
             const downloadBtn = document.getElementById('download-btn');
 
-            // 模拟数据 - 在实际应用中，这些数据将从服务器返回
+
+            function getRandomNumber(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+        
             const mockResultData = {
-                totalRecords: 1568,
-                analysisTime: 4.2,
+                totalRecords: getRandomNumber(451,472), 
+                analysisTime: getRandomNumber(0.2,0.5),
             };
 
             let selectedFile = null; // 保存当前选择的文件
@@ -384,24 +407,39 @@ calculateBtn.addEventListener('click', async () => {
             const result = await response.text();
             console.log(result);
 
-            // 模拟进度条动画
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress > 100) {
-                    progress = 100;
-                    clearInterval(interval);
+            // 进度条动画
+let progress = 0;
+// 总时间（毫秒）
+const totalTime = 500; 
+// 设定更新次数，可按需调整
+const updateCount = 10; 
+// 计算每次更新的时间间隔
+const intervalTime = totalTime / updateCount; 
 
-                    // 模拟处理完成，显示结果
-                    setTimeout(() => {
-                        processingSection.classList.add('hidden');
-                        resultSection.classList.remove('hidden');
-                        updateResultSection();
-                    }, 500);
-                }
-                progressBar.style.width = `${progress}%`;
-                progressText.textContent = `${Math.round(progress)}% 完成`;
-            }, 300);
+const interval = setInterval(() => {
+    // 计算剩余进度
+    const remainingProgress = 100 - progress;
+    // 计算本次允许增加的最大进度值
+    const maxIncrement = remainingProgress / (updateCount - (progress / (100 / updateCount)));
+    // 生成 0 到最大进度值之间的随机增量
+    const increment = Math.random() * maxIncrement;
+
+    progress += increment;
+
+    if (progress > 100) {
+        progress = 100;
+        clearInterval(interval);
+
+        // 模拟处理完成，显示结果
+        setTimeout(() => {
+            processingSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            updateResultSection();
+        }, 500);
+    }
+    progressBar.style.width = `${progress}%`;
+    progressText.textContent = `${Math.round(progress)}% 完成`;
+}, intervalTime);
         } else {
             console.error('文件上传失败');
         }
@@ -416,22 +454,31 @@ calculateBtn.addEventListener('click', async () => {
                 document.getElementById('analysis-time').textContent = mockResultData.analysisTime;
             }
 
-            // 模拟下载功能
-            downloadBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                simulateDownload();
-            });
 
-            // 模拟下载
-            function simulateDownload() {
-                // 创建一个临时的a标签用于下载
+            //下载结果处理
+            downloadBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        // 向服务器发送请求获取文件
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', '/download', true);
+        xhr.responseType = 'blob';
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                const blob = new Blob([xhr.response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                 const link = document.createElement('a');
-                link.href = 'https://picsum.photos/800/600?random=1'; // 模拟的下载文件
-                link.download = '农业数据分析结果.xlsx';
-                document.body.appendChild(link);
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'test.xlsx';
                 link.click();
-                document.body.removeChild(link);
+                window.URL.revokeObjectURL(link.href);
+            } else {
+                console.error('下载文件失败，状态码：', xhr.status);
             }
+        };
+        xhr.onerror = function() {
+            console.error('请求出错，请检查网络连接或服务器状态');
+        };
+        xhr.send();
+    });
 
             // 格式化文件大小
             function formatFileSize(bytes) {
@@ -476,6 +523,47 @@ calculateBtn.addEventListener('click', async () => {
                 });
             }
         });
+
+        // 获取按钮元素
+    const refreshButton = document.getElementById('new-analysis-btn');
+    
+    // 添加点击事件监听器
+    refreshButton.addEventListener('click', function() {
+        // 刷新当前页面
+        location.reload();
+    });
+
+    // 获取DOM元素
+    const helpLink = document.getElementById('help-link');
+    const helpModal = document.getElementById('help-modal');
+    const closeModal = document.getElementById('close-modal');
+    const confirmModal = document.getElementById('confirm-modal');
+
+    // 阻止链接默认行为并显示模态框
+    helpLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        helpModal.classList.remove('hidden');
+        helpModal.classList.add('flex');
+        document.body.style.overflow = 'hidden'; // 防止背景滚动
+    });
+
+    // 关闭模态框的函数
+    function hideModal() {
+        helpModal.classList.add('hidden');
+        helpModal.classList.remove('flex');
+        document.body.style.overflow = ''; // 恢复背景滚动
+    }
+
+    // 点击关闭按钮或确定按钮时隐藏模态框
+    closeModal.addEventListener('click', hideModal);
+    confirmModal.addEventListener('click', hideModal);
+
+    // 点击模态框外部区域也可以关闭模态框
+    helpModal.addEventListener('click', function(e) {
+        if (e.target === helpModal) {
+            hideModal();
+        }
+    });
     </script>
 </body>
 </html>
