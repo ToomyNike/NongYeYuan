@@ -359,49 +359,56 @@
             }
 
             // 开始计算按钮点击事件
-            calculateBtn.addEventListener('click', async () => {
-                processingSection.classList.remove('hidden');
-                resultSection.classList.add('hidden');
+calculateBtn.addEventListener('click', async () => {
+    // 获取选中的区域值
+    const selectedArea = document.querySelector('input[name="area"]:checked');
+    if (!selectedArea) {
+        alert('请选择一个农业源区域');
+        return;
+    }
 
-                const formData = new FormData();
-                formData.append('file-input', selectedFile); // 使用保存的文件
+    processingSection.classList.remove('hidden');
+    resultSection.classList.add('hidden');
 
-                try {
-                    const response = await fetch('/home', {
-                        method: 'POST',
-                        body: formData
-                    });
+    const formData = new FormData();
+    formData.append('file-input', selectedFile); // 使用保存的文件
+    formData.append('selected-area', selectedArea.value);
 
-                    if (response.ok) {
-                        const result = await response.text();
-                        console.log(result);
+    try {
+        const response = await fetch('/home', {
+            method: 'POST',
+            body: formData
+        });
 
-                        // 模拟进度条动画
-                        let progress = 0;
-                        const interval = setInterval(() => {
-                            progress += Math.random() * 15;
-                            if (progress > 100) {
-                                progress = 100;
-                                clearInterval(interval);
+        if (response.ok) {
+            const result = await response.text();
+            console.log(result);
 
-                                // 模拟处理完成，显示结果
-                                setTimeout(() => {
-                                    processingSection.classList.add('hidden');
-                                    resultSection.classList.remove('hidden');
-                                    updateResultSection();
-                                }, 500);
-                            }
-                            progressBar.style.width = `${progress}%`;
-                            progressText.textContent = `${Math.round(progress)}% 完成`;
-                        }, 300);
-                    } else {
-                        console.error('文件上传失败');
-                    }
-                } catch (error) {
-                    console.error('请求出错:', error);
+            // 模拟进度条动画
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) {
+                    progress = 100;
+                    clearInterval(interval);
+
+                    // 模拟处理完成，显示结果
+                    setTimeout(() => {
+                        processingSection.classList.add('hidden');
+                        resultSection.classList.remove('hidden');
+                        updateResultSection();
+                    }, 500);
                 }
-            });
-
+                progressBar.style.width = `${progress}%`;
+                progressText.textContent = `${Math.round(progress)}% 完成`;
+            }, 300);
+        } else {
+            console.error('文件上传失败');
+        }
+    } catch (error) {
+        console.error('请求出错:', error);
+    }
+});
             // 更新结果区域
             function updateResultSection() {
                 // 更新统计数据

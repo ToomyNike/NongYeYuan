@@ -1,5 +1,8 @@
 from flask import Blueprint, request, render_template
 import os
+from Quanmian import runQuanmian
+from HeHu import runHeHu
+from XiaoQu import runXiaoQu
 
 hm = Blueprint('home', __name__)
 
@@ -30,14 +33,27 @@ def home():
     
     try:
         # 获取文件名
-        
         filename = file.filename
-        print("上传文件：",filename)
+        print("上传文件：", filename)
         # 保存文件到上传文件夹
         file.save(os.path.join(UPLOAD_FOLDER, filename))
-        
+
+        # 获取选中的区域值
+        selected_area = request.form.get('selected-area')
+        if selected_area:
+            
+            if selected_area == "县区域":
+                print("选中的区域:", selected_area)
+                runQuanmian()
+            elif selected_area == "河湖流域":
+                print("选中的区域:", selected_area)
+                runHeHu()
+            elif selected_area == "重点小流域":
+                print("选中的区域:", selected_area)
+                runXiaoQu()
+
         return "File saved successfully", 200
     
     except Exception as e:
-        print(5)
+        print("Somethings went wrong:")
         return f"Error processing file: {str(e)}", 500
