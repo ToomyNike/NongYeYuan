@@ -16,7 +16,8 @@ NONGYETYUAN
         views:视图方法文件
         __init()__.py：falsk初始化和方法注册
     app.py:启动方法
-    
+    脚本处理：
+    Quamian.py/Hehu.py/XiaoQu.py 对应三个区域的处理脚本
 
 #### 安装教程
 

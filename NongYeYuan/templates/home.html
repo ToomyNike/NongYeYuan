@@ -83,74 +83,93 @@
         </section>
 
         <!-- 上传区域 -->
-        <!-- 上传区域 -->
 <section class="bg-white rounded-xl shadow-card p-8 mb-12 transition-custom hover:shadow-card-hover">
-    <div class="flex flex-col md:flex-row gap-8">
-        <div class="md:w-full">
-            <h3 class="text-2xl font-bold text-dark mb-4 flex items-center">
-                <i class="fa fa-upload text-primary mr-3"></i>上传数据
-            </h3>
-            <p class="text-gray-600 mb-6">
-                请上传包含农业源调查数据的Excel文件，系统支持.xlsx和.xls格式。
-            </p>
-            
-            <!-- 上传文件区域 -->
-            <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-custom">
-                <i class="fa fa-file-excel-o text-5xl text-gray-400 mb-4"></i>
-                <p class="text-gray-500 mb-2">拖放Excel文件到此处，或点击上传</p>
-                <p class="text-xs text-gray-400">支持 .xlsx, .xls 格式，最大文件大小 50MB</p>
-                <input type="file" id="file-input" class="hidden" accept=".xlsx,.xls">
+    <h3 class="text-2xl font-bold text-dark mb-4 flex items-center">
+        <i class="fa fa-upload text-primary mr-3"></i>上传数据
+    </h3>
+    <p class="text-gray-600 mb-6">
+        请上传包含农业源调查数据的Excel文件，系统支持.xlsx和.xls格式。
+    </p>
+    
+    <!-- 整合区域选择和文件上传的容器 -->
+    <div class="flex flex-col md:flex-row gap-4">
+        <!-- 区域选择框 - 放在虚线框左侧 -->
+        <div class="md:w-1/4 border-2 border-gray-200 rounded-lg p-4 flex flex-col">
+            <h4 class="font-bold text-dark mb-3">选择区域</h4>
+            <div id="area-selection" class="flex flex-col gap-2 flex-grow">
+                <label for="county" class="flex items-center cursor-pointer p-3 rounded-md hover:bg-primary/10 transition-custom">
+                    <input type="radio" id="county" name="area" value="县区域" class="mr-2" onclick="selectArea(this)">
+                    <span class="text-gray-600">县区域</span>
+                </label>
+                <label for="river-basin" class="flex items-center cursor-pointer p-3 rounded-md hover:bg-primary/10 transition-custom">
+                    <input type="radio" id="river-basin" name="area" value="河湖流域" class="mr-2" onclick="selectArea(this)">
+                    <span class="text-gray-600">河湖流域</span>
+                </label>
+                <label for="small-basin" class="flex items-center cursor-pointer p-3 rounded-md hover:bg-primary/10 transition-custom">
+                    <input type="radio" id="small-basin" name="area" value="重点小流域" class="mr-2" onclick="selectArea(this)">
+                    <span class="text-gray-600">重点小流域</span>
+                </label>
             </div>
-            
-            <!-- 已选择文件信息 -->
-            <div id="file-info" class="mt-4 hidden">
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div class="flex items-center">
-                        <i class="fa fa-file-excel-o text-primary mr-3"></i>
-                        <div>
-                            <p id="file-name" class="font-medium text-dark truncate max-w-xs"></p>
-                            <p id="file-size" class="text-xs text-gray-500"></p>
-                        </div>
-                    </div>
-                    <button id="remove-file" class="text-gray-400 hover:text-red-500 transition-custom">
-                        <i class="fa fa-times"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- 计算类型选择 -->
-            <div class="mt-6">
-                <h3 class="text-lg font-bold text-dark mb-2 flex items-center">
-                    <i class="fa fa-calculator text-primary mr-3"></i>计算类型
-                </h3>
-                <div class="flex space-x-4">
-                    <label for="an" class="flex items-center cursor-pointer">
-                        <input type="radio" id="an" name="calculation-type" value="氨氮" class="mr-2" onclick="selectCalculationType(this)">
-                        <span class="text-gray-600">氨氮</span>
-                    </label>
-                    <label for="tn" class="flex items-center cursor-pointer">
-                        <input type="radio" id="tn" name="calculation-type" value="总氮" class="mr-2" onclick="selectCalculationType(this)">
-                        <span class="text-gray-600">总氮</span>
-                    </label>
-                    <label for="tp" class="flex items-center cursor-pointer">
-                        <input type="radio" id="tp" name="calculation-type" value="总磷" class="mr-2" onclick="selectCalculationType(this)">
-                        <span class="text-gray-600">总磷</span>
-                    </label>
-                    <label for="sum" class="flex items-center cursor-pointer">
-                        <input type="radio" id="sum" name="calculation-type" value="汇总" class="mr-2" onclick="selectCalculationType(this)">
-                        <span class="text-gray-600">汇总</span>
-                    </label>
-                </div>
-            </div>
-            
-            <!-- 开始计算按钮 -->
-            <div class="mt-8 text-center">
-                <button id="calculate-btn" class="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-custom flex items-center mx-auto disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                    <i class="fa fa-calculator mr-2"></i>
-                    开始计算
-                </button>
-            </div>
+            <!-- 底部间距 -->
+            <div class="mt-auto"></div>
         </div>
+        
+        <!-- 文件上传区域 - 虚线框 -->
+        <div class="md:w-3/4 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer flex flex-col justify-center items-center" id="upload-area">
+            <i class="fa fa-file-excel-o text-5xl text-gray-400 mb-4"></i>
+            <p class="text-gray-500 mb-2">拖放Excel文件到此处，或点击上传</p>
+            <p class="text-xs text-gray-400">支持 .xlsx, .xls 格式，最大文件大小 50MB</p>
+            <input type="file" id="file-input" class="hidden" accept=".xlsx,.xls">
+        </div>
+    </div>
+    
+    <!-- 已选择文件信息 -->
+    <div id="file-info" class="mt-4 hidden">
+        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div class="flex items-center">
+                <i class="fa fa-file-excel-o text-primary mr-3"></i>
+                <div>
+                    <p id="file-name" class="font-medium text-dark truncate max-w-xs"></p>
+                    <p id="file-size" class="text-xs text-gray-500"></p>
+                </div>
+            </div>
+            <button id="remove-file" class="text-gray-400 hover:text-red-500 transition-custom">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 计算类型选择 -->
+    <div class="mt-6">
+        <h3 class="text-lg font-bold text-dark mb-2 flex items-center">
+            <i class="fa fa-calculator text-primary mr-3"></i>计算类型
+        </h3>
+        <div class="flex space-x-4">
+            <label for="an" class="flex items-center cursor-pointer">
+                <input type="radio" id="an" name="calculation-type" value="氨氮" class="mr-2" onclick="selectCalculationType(this)">
+                <span class="text-gray-600">氨氮</span>
+            </label>
+            <label for="tn" class="flex items-center cursor-pointer">
+                <input type="radio" id="tn" name="calculation-type" value="总氮" class="mr-2" onclick="selectCalculationType(this)">
+                <span class="text-gray-600">总氮</span>
+            </label>
+            <label for="tp" class="flex items-center cursor-pointer">
+                <input type="radio" id="tp" name="calculation-type" value="总磷" class="mr-2" onclick="selectCalculationType(this)">
+                <span class="text-gray-600">总磷</span>
+            </label>
+            <label for="sum" class="flex items-center cursor-pointer">
+                <input type="radio" id="sum" name="calculation-type" value="汇总" class="mr-2" onclick="selectCalculationType(this)">
+                <span class="text-gray-600">汇总</span>
+            </label>
+        </div>
+    </div>
+    
+    <!-- 开始计算按钮 -->
+    <div class="mt-8 text-center">
+        <button id="calculate-btn" class="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-custom flex items-center mx-auto disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <i class="fa fa-calculator mr-2"></i>
+            开始计算
+        </button>
     </div>
 </section>
 
@@ -251,193 +270,205 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-    const uploadArea = document.getElementById('upload-area');
-    const fileInput = document.getElementById('file-input');
-    const fileInfo = document.getElementById('file-info');
-    const fileName = document.getElementById('file-name');
-    const fileSize = document.getElementById('file-size');
-    const removeFile = document.getElementById('remove-file');
-    const calculateBtn = document.getElementById('calculate-btn');
-    const processingSection = document.getElementById('processing-section');
-    const resultSection = document.getElementById('result-section');
-    const progressBar = document.getElementById('progress-bar');
-    const progressText = document.getElementById('progress-text');
-    const newAnalysisBtn = document.getElementById('new-analysis-btn');
-    const downloadBtn = document.getElementById('download-btn');
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+            const fileInfo = document.getElementById('file-info');
+            const fileName = document.getElementById('file-name');
+            const fileSize = document.getElementById('file-size');
+            const removeFile = document.getElementById('remove-file');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const processingSection = document.getElementById('processing-section');
+            const resultSection = document.getElementById('result-section');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const newAnalysisBtn = document.getElementById('new-analysis-btn');
+            const downloadBtn = document.getElementById('download-btn');
 
-    // 模拟数据 - 在实际应用中，这些数据将从服务器返回
-    const mockResultData = {
-        totalRecords: 1568,
-        analysisTime: 4.2,
-    };
+            // 模拟数据 - 在实际应用中，这些数据将从服务器返回
+            const mockResultData = {
+                totalRecords: 1568,
+                analysisTime: 4.2,
+            };
 
-    let selectedFile = null; // 保存当前选择的文件
+            let selectedFile = null; // 保存当前选择的文件
 
-    // 文件上传区域点击事件
-    uploadArea.addEventListener('click', () => {
-        fileInput.click();
-    });
-
-    // 拖放功能
-    uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.classList.add('border-primary');
-        uploadArea.classList.add('bg-primary/5');
-    });
-
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('border-primary');
-        uploadArea.classList.remove('bg-primary/5');
-    });
-
-    uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove('border-primary');
-        uploadArea.classList.remove('bg-primary/5');
-
-        if (e.dataTransfer.files.length) {
-            selectedFile = e.dataTransfer.files[0]; // 保存拖入的文件
-            handleFile(selectedFile);
-        }
-    });
-
-    // 文件选择事件
-    fileInput.addEventListener('change', () => {
-        if (fileInput.files.length) {
-            selectedFile = fileInput.files[0]; // 保存点击选择的文件
-            handleFile(selectedFile);
-        }
-    });
-
-    // 移除文件
-    removeFile.addEventListener('click', () => {
-        resetFileSelection();
-    });
-
-    // 处理文件选择
-    function handleFile(file) {
-        // 检查文件类型
-        if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
-            alert('请上传Excel文件 (.xlsx 或 .xls)');
-            return;
-        }
-
-        // 显示文件信息
-        fileName.textContent = file.name;
-        fileSize.textContent = formatFileSize(file.size);
-        fileInfo.classList.remove('hidden');
-
-        // 启用计算按钮
-        calculateBtn.disabled = false;
-    }
-
-    // 重置文件选择
-    function resetFileSelection() {
-        fileInput.value = '';
-        selectedFile = null; // 清空保存的文件
-        fileInfo.classList.add('hidden');
-        calculateBtn.disabled = true;
-    }
-
-    // 开始计算按钮点击事件
-    calculateBtn.addEventListener('click', async () => {
-        processingSection.classList.remove('hidden');
-        resultSection.classList.add('hidden');
-
-        const formData = new FormData();
-        formData.append('file-input', selectedFile); // 使用保存的文件
-
-        try {
-            const response = await fetch('/home', {
-                method: 'POST',
-                body: formData
+            // 文件上传区域点击事件
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
             });
 
-            if (response.ok) {
-                const result = await response.text();
-                console.log(result);
+            // 拖放功能
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('border-primary');
+                uploadArea.classList.add('bg-primary/5');
+            });
 
-                // 模拟进度条动画
-                let progress = 0;
-                const interval = setInterval(() => {
-                    progress += Math.random() * 15;
-                    if (progress > 100) {
-                        progress = 100;
-                        clearInterval(interval);
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('border-primary');
+                uploadArea.classList.remove('bg-primary/5');
+            });
 
-                        // 模拟处理完成，显示结果
-                        setTimeout(() => {
-                            processingSection.classList.add('hidden');
-                            resultSection.classList.remove('hidden');
-                            updateResultSection();
-                        }, 500);
-                    }
-                    progressBar.style.width = `${progress}%`;
-                    progressText.textContent = `${Math.round(progress)}% 完成`;
-                }, 300);
-            } else {
-                console.error('文件上传失败');
-            }
-        } catch (error) {
-            console.error('请求出错:', error);
-        }
-    });
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('border-primary');
+                uploadArea.classList.remove('bg-primary/5');
 
-    // 更新结果区域
-    function updateResultSection() {
-        // 更新统计数据
-        document.getElementById('total-records').textContent = mockResultData.totalRecords;
-        document.getElementById('analysis-time').textContent = mockResultData.analysisTime;
-    }
-
-    // 模拟下载功能
-    downloadBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        simulateDownload();
-    });
-
-    // 模拟下载
-    function simulateDownload() {
-        // 创建一个临时的a标签用于下载
-        const link = document.createElement('a');
-        link.href = 'https://picsum.photos/800/600?random=1'; // 模拟的下载文件
-        link.download = '农业数据分析结果.xlsx';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    // 格式化文件大小
-    function formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-    
-    // 处理计算类型选择
-    function selectCalculationType(radio) {
-            const labels = document.querySelectorAll('label[for^="an"], label[for^="tn"], label[for^="tp"], label[for^="sum"]');
-            labels.forEach(label => {
-                const span = label.querySelector('span');
-                if (label.getAttribute('for') === radio.id) {
-                    span.classList.remove('text-gray-600');
-                    span.classList.add('text-primary', 'font-bold');
-                } else {
-                    span.classList.remove('text-primary', 'font-bold');
-                    span.classList.add('text-gray-600');
+                if (e.dataTransfer.files.length) {
+                    selectedFile = e.dataTransfer.files[0]; // 保存拖入的文件
+                    handleFile(selectedFile);
                 }
             });
-        }
 
+            // 文件选择事件
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length) {
+                    selectedFile = fileInput.files[0]; // 保存点击选择的文件
+                    handleFile(selectedFile);
+                }
+            });
 
-});
-      
+            // 移除文件
+            removeFile.addEventListener('click', () => {
+                resetFileSelection();
+            });
 
+            // 处理文件选择
+            function handleFile(file) {
+                // 检查文件类型
+                if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
+                    alert('请上传Excel文件 (.xlsx 或 .xls)');
+                    return;
+                }
 
+                // 显示文件信息
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileInfo.classList.remove('hidden');
+
+                // 启用计算按钮
+                calculateBtn.disabled = false;
+            }
+
+            // 重置文件选择
+            function resetFileSelection() {
+                fileInput.value = '';
+                selectedFile = null; // 清空保存的文件
+                fileInfo.classList.add('hidden');
+                calculateBtn.disabled = true;
+            }
+
+            // 开始计算按钮点击事件
+            calculateBtn.addEventListener('click', async () => {
+                processingSection.classList.remove('hidden');
+                resultSection.classList.add('hidden');
+
+                const formData = new FormData();
+                formData.append('file-input', selectedFile); // 使用保存的文件
+
+                try {
+                    const response = await fetch('/home', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const result = await response.text();
+                        console.log(result);
+
+                        // 模拟进度条动画
+                        let progress = 0;
+                        const interval = setInterval(() => {
+                            progress += Math.random() * 15;
+                            if (progress > 100) {
+                                progress = 100;
+                                clearInterval(interval);
+
+                                // 模拟处理完成，显示结果
+                                setTimeout(() => {
+                                    processingSection.classList.add('hidden');
+                                    resultSection.classList.remove('hidden');
+                                    updateResultSection();
+                                }, 500);
+                            }
+                            progressBar.style.width = `${progress}%`;
+                            progressText.textContent = `${Math.round(progress)}% 完成`;
+                        }, 300);
+                    } else {
+                        console.error('文件上传失败');
+                    }
+                } catch (error) {
+                    console.error('请求出错:', error);
+                }
+            });
+
+            // 更新结果区域
+            function updateResultSection() {
+                // 更新统计数据
+                document.getElementById('total-records').textContent = mockResultData.totalRecords;
+                document.getElementById('analysis-time').textContent = mockResultData.analysisTime;
+            }
+
+            // 模拟下载功能
+            downloadBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                simulateDownload();
+            });
+
+            // 模拟下载
+            function simulateDownload() {
+                // 创建一个临时的a标签用于下载
+                const link = document.createElement('a');
+                link.href = 'https://picsum.photos/800/600?random=1'; // 模拟的下载文件
+                link.download = '农业数据分析结果.xlsx';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            // 格式化文件大小
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            // 处理计算类型选择
+            function selectCalculationType(radio) {
+                const labels = document.querySelectorAll('label[for^="an"], label[for^="tn"], label[for^="tp"], label[for^="sum"]');
+                labels.forEach(label => {
+                    const span = label.querySelector('span');
+                    if (label.getAttribute('for') === radio.id) {
+                        span.classList.remove('text-gray-600');
+                        span.classList.add('text-primary', 'font-bold');
+                    } else {
+                        span.classList.remove('text-primary', 'font-bold');
+                        span.classList.add('text-gray-600');
+                    }
+                });
+            }
+
+            // 处理区域选择
+            function selectArea(radio) {
+                const labels = document.querySelectorAll('label[for^="county"], label[for^="river-basin"], label[for^="small-basin"]');
+                labels.forEach(label => {
+                    const span = label.querySelector('span');
+                    if (label.getAttribute('for') === radio.id) {
+                        label.classList.add('bg-primary/10');
+                        span.classList.remove('text-gray-600');
+                        span.classList.add('text-primary', 'font-bold');
+                    } else {
+                        label.classList.remove('bg-primary/10');
+                        span.classList.remove('text-primary', 'font-bold');
+                        span.classList.add('text-gray-600');
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
