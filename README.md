@@ -4,9 +4,9 @@
 2025.5.20 农业源软著系统用
 
 #### 技术选型
-HTML
-CSS 轻量级框架Bootstrap
-JS jQuery 
+Flask框架
+MVC架构
+Tailwind CSS 
 
 #### 软件架构
 NONGYETYUAN
@@ -15,7 +15,8 @@ NONGYETYUAN
         templates:HTML前端文件
         views:视图方法文件
         __init()__.py：falsk初始化和方法注册
-    app.py:启动函数
+    app.py:启动方法
+    
 
 #### 安装教程
 
