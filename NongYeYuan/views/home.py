@@ -6,40 +6,35 @@ from XiaoQu import runXiaoQu
 
 hm = Blueprint('home', __name__)
 
-# 配置上传文件夹
+# 配置上传
 UPLOAD_FOLDER = 'input'
-# 确保上传文件夹存在
+
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 @hm.route('/home', methods=["GET", "POST"])
 def home():
     if request.method == "GET":
-        # 渲染 home.html 页面
         print("已渲染")
         return render_template('home.html')
-    
-    # 处理 POST 请求（文件上传）
     if 'file-input' not in request.files:
         print("未获取文件")
         return "No file part", 400
     
     file = request.files['file-input']
     
-    # 检查用户是否选择了文件
     if file.filename == '':
         print("文件名为空")
         return "No selected file", 400
     
     try:
-        # 获取文件名
+        
         filename = file.filename
         print("上传文件：", filename)
-        # 保存文件到上传文件夹
         file.save(os.path.join(UPLOAD_FOLDER, filename))
 
-        # 获取选中的区域值
-        selected_area = request.form.get('selected-area')
+  
+        selected_area = request.form.get('selected-area')      # 获取选中的区域值
         if selected_area:
             
             if selected_area == "县区域":
@@ -62,16 +57,11 @@ def home():
 @hm.route('/download')
 def download_file():
     try:
-        # 获取当前脚本所在目录
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        # 构建到 NongYeYuan 目录的路径
         nongyeyuan_dir = os.path.dirname(current_dir)
-        # 构建到 output 目录的路径
         output_dir = os.path.join(os.path.dirname(nongyeyuan_dir), 'output')
-        # 构建完整的文件路径
         file_path = os.path.join(output_dir, 'result_test.xlsx')
 
-        # 检查文件是否存在
         if not os.path.exists(file_path):
             print(f"文件不存在: {file_path}")
             return "文件不存在", 404

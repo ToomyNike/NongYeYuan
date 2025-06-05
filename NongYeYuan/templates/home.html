@@ -14,10 +14,10 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#4CAF50',     // 主色调：绿色，代表农业
-                        secondary: '#FF9800',   // 辅助色：橙色，代表收获
-                        neutral: '#F5F7FA',     // 中性色：浅灰，用于背景
-                        dark: '#2D3748',        // 深色：深灰，用于文本
+                        primary: '#4CAF50',     // 主色
+                        secondary: '#FF9800',   // 辅助
+                        neutral: '#F5F7FA',     
+                        dark: '#2D3748',      
                     },
                     fontFamily: {
                         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -46,7 +46,7 @@
     </style>
 </head>
 <body class="bg-neutral bg-pattern min-h-screen">
-    <!-- 顶部导航栏 -->
+    <!-- 顶部导航 -->
     <header class="bg-primary text-white shadow-md sticky top-0 z-50 transition-custom">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -60,7 +60,7 @@
                 <a href="#" id="help-link" class="hover:text-secondary transition-custom flex items-center">
                     <i class="fa fa-question-circle mr-2"></i>帮助
                 </a>
-                <!-- 模态框容器 -->
+        
 <div id="help-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl">
         <div class="flex justify-between items-start mb-4">
@@ -91,7 +91,6 @@
 
     <!-- 主内容区 -->
     <main class="container mx-auto px-4 py-8">
-        <!-- 欢迎信息 -->
         <section class="mb-12 text-center">
             <h2 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-dark mb-4">
                 高效计算农业源数据，助力科学决策
@@ -101,7 +100,7 @@
             </p>
         </section>
 
-        <!-- 上传区域 -->
+
 <section class="bg-white rounded-xl shadow-card p-8 mb-12 transition-custom hover:shadow-card-hover">
     <h3 class="text-2xl font-bold text-dark mb-4 flex items-center">
         <i class="fa fa-upload text-primary mr-3"></i>上传数据
@@ -110,9 +109,8 @@
         请上传包含农业源调查数据的Excel文件，系统支持.xlsx和.xls格式。
     </p>
     
-    <!-- 整合区域选择和文件上传的容器 -->
     <div class="flex flex-col md:flex-row gap-4">
-        <!-- 区域选择框 - 放在虚线框左侧 -->
+
         <div class="md:w-1/4 border-2 border-gray-200 rounded-lg p-4 flex flex-col">
             <h4 class="font-bold text-dark mb-3">选择区域</h4>
             <div id="area-selection" class="flex flex-col gap-2 flex-grow">
@@ -133,7 +131,6 @@
             <div class="mt-auto"></div>
         </div>
         
-        <!-- 文件上传区域 - 虚线框 -->
         <div class="md:w-3/4 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer flex flex-col justify-center items-center" id="upload-area">
             <i class="fa fa-file-excel-o text-5xl text-gray-400 mb-4"></i>
             <p class="text-gray-500 mb-2">拖放Excel文件到此处，或点击上传</p>
@@ -199,7 +196,6 @@
             </h3>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <!-- 结果卡片 1 -->
                 <div class="bg-neutral rounded-lg p-5 shadow-sm">
                     <div class="flex justify-between items-start mb-3">
                         <h4 class="font-semibold text-dark">数据总量</h4>
@@ -211,7 +207,6 @@
                     <p class="text-gray-500 text-sm">条记录</p>
                 </div>
                 
-                <!-- 结果卡片 2 -->
                 <div class="bg-neutral rounded-lg p-5 shadow-sm">
                     <div class="flex justify-between items-start mb-3">
                         <h4 class="font-semibold text-dark">分析耗时</h4>
@@ -223,7 +218,6 @@
                     <p class="text-gray-500 text-sm">秒</p>
                 </div>
                 
-                <!-- 结果卡片 3 -->
                 <div class="bg-neutral rounded-lg p-5 shadow-sm">
                     <div class="flex justify-between items-start mb-3">
                         <h4 class="font-semibold text-dark">完成状态</h4>
@@ -320,7 +314,6 @@
                 fileInput.click();
             });
 
-            // 拖放功能
             uploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 uploadArea.classList.add('border-primary');
@@ -409,19 +402,13 @@ calculateBtn.addEventListener('click', async () => {
 
             // 进度条动画
 let progress = 0;
-// 总时间（毫秒）
 const totalTime = 500; 
-// 设定更新次数，可按需调整
 const updateCount = 10; 
-// 计算每次更新的时间间隔
 const intervalTime = totalTime / updateCount; 
 
 const interval = setInterval(() => {
-    // 计算剩余进度
     const remainingProgress = 100 - progress;
-    // 计算本次允许增加的最大进度值
     const maxIncrement = remainingProgress / (updateCount - (progress / (100 / updateCount)));
-    // 生成 0 到最大进度值之间的随机增量
     const increment = Math.random() * maxIncrement;
 
     progress += increment;
@@ -449,7 +436,6 @@ const interval = setInterval(() => {
 });
             // 更新结果区域
             function updateResultSection() {
-                // 更新统计数据
                 document.getElementById('total-records').textContent = mockResultData.totalRecords;
                 document.getElementById('analysis-time').textContent = mockResultData.analysisTime;
             }
@@ -480,7 +466,6 @@ const interval = setInterval(() => {
         xhr.send();
     });
 
-            // 格式化文件大小
             function formatFileSize(bytes) {
                 if (bytes === 0) return '0 Bytes';
 
@@ -491,7 +476,6 @@ const interval = setInterval(() => {
                 return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
             }
             
-            // 处理计算类型选择
             function selectCalculationType(radio) {
                 const labels = document.querySelectorAll('label[for^="an"], label[for^="tn"], label[for^="tp"], label[for^="sum"]');
                 labels.forEach(label => {
@@ -506,7 +490,6 @@ const interval = setInterval(() => {
                 });
             }
 
-            // 处理区域选择
             function selectArea(radio) {
                 const labels = document.querySelectorAll('label[for^="county"], label[for^="river-basin"], label[for^="small-basin"]');
                 labels.forEach(label => {
@@ -527,14 +510,13 @@ const interval = setInterval(() => {
         // 获取按钮元素
     const refreshButton = document.getElementById('new-analysis-btn');
     
-    // 添加点击事件监听器
-    refreshButton.addEventListener('click', function() {
-        // 刷新当前页面
+
+    refreshButton.addEventListener('click', function() {    // 添加点击事件监听器
         location.reload();
     });
 
-    // 获取DOM元素
-    const helpLink = document.getElementById('help-link');
+
+    const helpLink = document.getElementById('help-link');     // 获取DOM元素
     const helpModal = document.getElementById('help-modal');
     const closeModal = document.getElementById('close-modal');
     const confirmModal = document.getElementById('confirm-modal');
@@ -554,11 +536,9 @@ const interval = setInterval(() => {
         document.body.style.overflow = ''; // 恢复背景滚动
     }
 
-    // 点击关闭按钮或确定按钮时隐藏模态框
     closeModal.addEventListener('click', hideModal);
     confirmModal.addEventListener('click', hideModal);
 
-    // 点击模态框外部区域也可以关闭模态框
     helpModal.addEventListener('click', function(e) {
         if (e.target === helpModal) {
             hideModal();
